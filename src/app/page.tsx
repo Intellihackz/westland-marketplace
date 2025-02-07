@@ -1,100 +1,188 @@
+'use client';
+
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Navigation } from "@/components/Navigation";
+import { useEffect, useState } from "react";
+import { Listing } from "@/lib/types/listing";
+
+const categories = [
+  'Textbooks',
+  'Electronics',
+  'Furniture',
+  'Notes',
+  'Clothing',
+  'Sports',
+  'Other'
+] as const;
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const router = useRouter();
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  
+  useEffect(() => {
+    fetchListings();
+  }, [selectedCategory]);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+  const fetchListings = async () => {
+    try {
+      let url = '/api/listings?limit=8';
+      if (selectedCategory) {
+        url += `&category=${selectedCategory}`;
+      }
+      const res = await fetch(url);
+      const data = await res.json();
+      setListings(data.listings);
+    } catch (error) {
+      console.error('Failed to fetch listings:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+  };
+
+  return (
+    <div className="min-h-screen">
+      <Navigation />
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <section className="text-center mb-12">
+          <h2 className="text-4xl font-bold mb-4">
+            Buy and sell within your university
+          </h2>
+          <p className="text-muted-foreground mb-8">
+            A safe and easy way to trade with fellow students
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+            <form onSubmit={handleSearch} className="flex gap-4 justify-center w-full max-w-md">
+              <input
+                type="search"
+                placeholder="Search for items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="px-4 py-2 rounded-full border border-input w-full"
+              />
+              <button
+                type="submit"
+                className="px-6 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+        </section>
+
+        {/* Featured Categories */}
+        <section className="mb-12">
+          <h3 className="text-2xl font-semibold mb-6">Browse Categories</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => {
+                  if (selectedCategory === category) {
+                    setSelectedCategory(null);
+                  } else {
+                    setSelectedCategory(category);
+                  }
+                }}
+                className={`p-4 rounded-lg border transition-colors cursor-pointer ${
+                  selectedCategory === category
+                    ? 'bg-foreground text-background hover:bg-foreground/90'
+                    : 'bg-card hover:border-foreground/20'
+                }`}
+              >
+                <p className="text-center font-medium">{category}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Recent Listings */}
+        <section>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-2xl font-semibold">
+              {selectedCategory ? `${selectedCategory} Listings` : 'Recent Listings'}
+            </h3>
+            <button
+              onClick={() => router.push('/listings')}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              View all →
+            </button>
+          </div>
+          
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-lg border bg-card overflow-hidden animate-pulse"
+                >
+                  <div className="aspect-square bg-muted"></div>
+                  <div className="p-4 space-y-2">
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-4 bg-muted rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {listings.map((listing) => (
+                <button
+                  key={listing._id}
+                  onClick={() => router.push(`/listings/${listing._id}`)}
+                  className="rounded-lg border bg-card overflow-hidden hover:border-foreground/20 transition-colors text-left"
+                >
+                  <div className="aspect-square relative">
+                    <Image
+                      src={listing.images[0]}
+                      alt={listing.title}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h4 className="font-medium mb-2 line-clamp-1">{listing.title}</h4>
+                    <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
+                      {listing.description}
+                    </p>
+                    <div className="flex justify-between items-center">
+                      <p className="font-bold">₦{listing.price.toLocaleString()}</p>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(listing.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {!loading && listings.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No listings found</p>
+            </div>
+          )}
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="border-t mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <p className="text-center text-muted-foreground">
+            © 2024 UniMarket. All rights reserved.
+          </p>
+        </div>
       </footer>
     </div>
   );
