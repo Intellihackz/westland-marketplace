@@ -2,13 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased touch-manipulation overflow-x-hidden min-h-screen;
+    font-family: var(--font-geist-sans), system-ui, sans-serif;
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  /* Better form elements for mobile */
+  input,
+  select,
+  textarea {
+    @apply text-base max-w-full;
+    font-size: 16px; /* Prevents zoom on focus in iOS */
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Mobile-first container */
+  .container {
+    @apply px-4 mx-auto w-full;
+    max-width: 100%;
+  }
+  
+  /* Safe area utilities */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -69,18 +103,34 @@ body {
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-@layer base {
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
     appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Mobile-first card */
+  .card {
+    @apply rounded-lg border bg-card p-4 shadow-sm;
+  }
+  
+  /* Mobile-first button */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-colors
+    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+  
+  /* Mobile-first modal */
+  .modal-content {
+    @apply fixed left-[50%] top-[50%] z-50 w-full max-w-lg translate-x-[-50%] translate-y-[-50%] border bg-background p-6 shadow-lg
+    sm:rounded-lg md:w-full;
+  }
+  
+  /* Mobile-first grid */
+  .responsive-grid {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
   }
 }

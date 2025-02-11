@@ -105,33 +105,44 @@ function ListingsContent() {
     <div className="min-h-screen">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold mb-6">Browse Listings</h1>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Browse Listings</h1>
 
           <div className="relative">
             {/* Search and Filter Bar */}
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
               <form onSubmit={handleSearch} className="flex-1 flex gap-2">
                 <input
                   type="search"
                   placeholder="Search listings..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-input"
+                  className="flex-1 px-4 py-3 sm:py-2 rounded-lg border border-input"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90"
+                  className="px-6 py-3 sm:py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90"
                 >
-                  Search
+                  <span className="sm:hidden">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </span>
+                  <span className="hidden sm:block">Search</span>
                 </button>
               </form>
               
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="px-3 py-2 rounded-lg border border-input hover:bg-secondary relative"
+                className="w-full sm:w-auto px-4 py-3 sm:py-2 rounded-lg border border-input hover:bg-secondary flex items-center justify-center gap-2 sm:gap-0"
                 aria-label="Toggle filters"
               >
                 <svg
@@ -147,6 +158,7 @@ function ListingsContent() {
                     d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
                   />
                 </svg>
+                <span className="sm:hidden">Filters</span>
                 {/* Active filters indicator */}
                 {(selectedCategory !== 'All' || 
                   selectedCondition !== 'All' || 
@@ -157,267 +169,199 @@ function ListingsContent() {
               </button>
             </div>
 
-            {/* Filters Dropdown */}
+            {/* Filters Panel - Full screen on mobile */}
             {showFilters && (
-              <div className="absolute right-0 top-full mt-2 w-72 p-4 bg-background border rounded-lg shadow-lg z-10 space-y-4">
-                {/* Category Filter */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Category</label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => {
-                      setSelectedCategory(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-lg border border-input px-3 py-2"
+              <div className="fixed sm:absolute inset-0 sm:inset-auto sm:right-0 sm:top-full sm:mt-2 w-full sm:w-72 bg-background sm:border sm:rounded-lg sm:shadow-lg z-50">
+                <div className="flex sm:hidden items-center justify-between p-4 border-b sticky top-0 bg-background">
+                  <h2 className="text-lg font-semibold">Filters</h2>
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="p-2 -m-2 hover:text-muted-foreground"
                   >
-                    {categories.map((category) => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
                 </div>
+                
+                <div className="p-4 space-y-4 max-h-[calc(100vh-4rem)] sm:max-h-[unset] overflow-y-auto">
+                  {/* Category Filter */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Category</label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => {
+                        setSelectedCategory(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+                    >
+                      {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
 
-                {/* Condition Filter */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Condition</label>
-                  <select
-                    value={selectedCondition}
-                    onChange={(e) => {
-                      setSelectedCondition(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-lg border border-input px-3 py-2"
-                  >
-                    {conditions.map((condition) => (
-                      <option key={condition} value={condition}>
-                        {condition === 'All' ? 'All' : condition.charAt(0).toUpperCase() + condition.slice(1)}
-                      </option>
-                    ))}
-                  </select>
+                  {/* Condition Filter */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Condition</label>
+                    <select
+                      value={selectedCondition}
+                      onChange={(e) => {
+                        setSelectedCondition(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+                    >
+                      {conditions.map((condition) => (
+                        <option key={condition} value={condition}>
+                          {condition === 'All' ? 'All' : condition.charAt(0).toUpperCase() + condition.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Price Range Filter */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Price Range</label>
+                    <select
+                      value={selectedPriceRange}
+                      onChange={(e) => {
+                        setSelectedPriceRange(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+                    >
+                      {priceRanges.map((range, index) => (
+                        <option key={range.label} value={index}>
+                          {range.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Sort By */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Sort By</label>
+                    <select
+                      value={sortBy}
+                      onChange={(e) => {
+                        setSortBy(e.target.value as SortOption);
+                        setCurrentPage(1);
+                      }}
+                      className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+                    >
+                      <option value="newest">Newest First</option>
+                      <option value="oldest">Oldest First</option>
+                      <option value="price-low">Price: Low to High</option>
+                      <option value="price-high">Price: High to Low</option>
+                    </select>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col gap-3 pt-2">
+                    <button
+                      onClick={() => {
+                        setSelectedCategory('All');
+                        setSelectedCondition('All');
+                        setSelectedPriceRange(0);
+                        setSortBy('newest');
+                        setCurrentPage(1);
+                      }}
+                      className="w-full px-4 py-3 sm:py-2 rounded-lg border border-input hover:bg-secondary text-sm"
+                    >
+                      Clear Filters
+                    </button>
+                    <button
+                      onClick={() => setShowFilters(false)}
+                      className="w-full px-4 py-3 sm:py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 text-sm sm:hidden"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
                 </div>
-
-                {/* Price Range Filter */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Price Range</label>
-                  <select
-                    value={selectedPriceRange}
-                    onChange={(e) => {
-                      setSelectedPriceRange(Number(e.target.value));
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-lg border border-input px-3 py-2"
-                  >
-                    {priceRanges.map((range, index) => (
-                      <option key={range.label} value={index}>
-                        {range.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Sort By */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">Sort By</label>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => {
-                      setSortBy(e.target.value as SortOption);
-                      setCurrentPage(1);
-                    }}
-                    className="w-full rounded-lg border border-input px-3 py-2"
-                  >
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                  </select>
-                </div>
-
-                {/* Clear Filters Button */}
-                <button
-                  onClick={() => {
-                    setSelectedCategory('All');
-                    setSelectedCondition('All');
-                    setSelectedPriceRange(0);
-                    setSortBy('newest');
-                    setCurrentPage(1);
-                  }}
-                  className="w-full px-4 py-2 rounded-lg border border-input hover:bg-secondary text-sm"
-                >
-                  Clear Filters
-                </button>
               </div>
             )}
           </div>
-
-          {/* Active Filters */}
-          <div className="mt-4 flex flex-wrap gap-2">
-            {selectedCategory !== 'All' && (
-              <span className="px-3 py-1 rounded-full bg-secondary text-sm flex items-center gap-1">
-                Category: {selectedCategory}
-                <button
-                  onClick={() => setSelectedCategory('All')}
-                  className="ml-1 hover:text-foreground/80"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedCondition !== 'All' && (
-              <span className="px-3 py-1 rounded-full bg-secondary text-sm flex items-center gap-1">
-                Condition: {selectedCondition}
-                <button
-                  onClick={() => setSelectedCondition('All')}
-                  className="ml-1 hover:text-foreground/80"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {selectedPriceRange !== 0 && (
-              <span className="px-3 py-1 rounded-full bg-secondary text-sm flex items-center gap-1">
-                Price: {priceRanges[selectedPriceRange].label}
-                <button
-                  onClick={() => setSelectedPriceRange(0)}
-                  className="ml-1 hover:text-foreground/80"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-            {sortBy !== 'newest' && (
-              <span className="px-3 py-1 rounded-full bg-secondary text-sm flex items-center gap-1">
-                Sort: {sortBy.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                <button
-                  onClick={() => setSortBy('newest')}
-                  className="ml-1 hover:text-foreground/80"
-                >
-                  ×
-                </button>
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Results Count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            {totalListings} {totalListings === 1 ? 'listing' : 'listings'} found
-          </p>
         </div>
 
         {/* Listings Grid */}
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-              <div
-                key={item}
-                className="rounded-lg border bg-card overflow-hidden animate-pulse"
-              >
-                <div className="aspect-square bg-muted"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                  <div className="h-4 bg-muted rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
+        {error ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">{error}</p>
-            <button
-              onClick={() => fetchListings()}
-              className="mt-4 px-4 py-2 rounded-lg bg-foreground text-background"
-            >
-              Try Again
-            </button>
+            <p className="text-destructive">{error}</p>
+          </div>
+        ) : loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-pulse">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-muted rounded-lg aspect-[3/4]" />
+            ))}
           </div>
         ) : listings.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No listings found</p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('All');
-                setSelectedCondition('All');
-                setSelectedPriceRange(0);
-                setSortBy('newest');
-                setCurrentPage(1);
-              }}
-              className="mt-4 px-4 py-2 rounded-lg bg-foreground text-background"
-            >
-              Clear Filters
-            </button>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {listings.map((listing) => (
-                <button
+                <a
                   key={listing._id}
-                  onClick={() => router.push(`/listings/${listing._id}`)}
-                  className="rounded-lg border bg-card overflow-hidden hover:border-foreground/20 transition-colors text-left"
+                  href={`/listings/${listing._id}`}
+                  className="group relative bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors"
                 >
-                  <div className="aspect-square relative">
-                    <Image
-                      src={listing.images[0]}
-                      alt={listing.title}
-                      fill
-                      className="object-cover"
-                    />
-                    {listing.status !== 'active' && (
-                      <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
-                        <span className="text-sm font-medium">
-                          {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                        </span>
-                      </div>
+                  <div className="aspect-[3/4] relative bg-muted">
+                    {listing.images?.[0] && (
+                      <Image
+                        src={listing.images[0]}
+                        alt={listing.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
                     )}
                   </div>
-                  <div className="p-4">
-                    <h4 className="font-medium mb-2 line-clamp-1">{listing.title}</h4>
-                    <p className="text-muted-foreground text-sm mb-2 line-clamp-2">
-                      {listing.description}
+                  <div className="p-3">
+                    <h3 className="font-medium line-clamp-1 group-hover:text-foreground/80">
+                      {listing.title}
+                    </h3>
+                    <p className="text-lg font-bold mt-1">
+                      ₦{listing.price.toLocaleString()}
                     </p>
-                    <div className="flex justify-between items-center">
-                      <p className="font-bold">₦{listing.price.toLocaleString()}</p>
-                      <span className="text-sm text-muted-foreground">
-                        {new Date(listing.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
+                    </p>
                   </div>
-                </button>
+                </a>
               ))}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="mt-8 flex justify-center gap-2">
+              <div className="flex justify-center items-center gap-2 mt-8 pt-4 border-t">
                 <button
-                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 rounded-lg border border-input hover:bg-secondary disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg border hover:bg-secondary disabled:opacity-50"
                 >
                   Previous
                 </button>
-                <div className="flex items-center gap-2">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`px-4 py-2 rounded-lg ${
-                        currentPage === page
-                          ? 'bg-foreground text-background'
-                          : 'border border-input hover:bg-secondary'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                </div>
+                <span className="text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </span>
                 <button
-                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 rounded-lg border border-input hover:bg-secondary disabled:opacity-50"
+                  className="px-4 py-2 rounded-lg border hover:bg-secondary disabled:opacity-50"
                 >
                   Next
                 </button>

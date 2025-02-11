@@ -108,13 +108,13 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen">
       <Navigation />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-bold mb-8">Messages</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Conversations List */}
-          <div className="border rounded-lg overflow-hidden">
+          <div className={`${selectedConversation ? 'hidden md:block' : 'block'} border rounded-lg overflow-hidden`}>
             {conversations.length === 0 ? (
               <div className="p-4 text-center text-gray-500">
                 No conversations yet
@@ -164,11 +164,17 @@ export default function MessagesPage() {
           </div>
 
           {/* Messages */}
-          <div className="md:col-span-2 border rounded-lg overflow-hidden flex flex-col h-[calc(100vh-16rem)]">
+          <div className={`${selectedConversation ? 'block' : 'hidden md:block'} md:col-span-2 border rounded-lg overflow-hidden flex flex-col h-[calc(100vh-16rem)]`}>
             {selectedConversation ? (
               <>
-                {/* Conversation Header */}
-                <div className="p-4 border-b">
+                {/* Conversation Header with Back Button for Mobile */}
+                <div className="p-4 border-b flex items-center">
+                  <button
+                    onClick={() => setSelectedConversation(null)}
+                    className="mr-4 text-blue-500 md:hidden"
+                  >
+                    &larr; Back
+                  </button>
                   <div className="flex items-center gap-4">
                     <div className="relative w-12 h-12">
                       <Image
@@ -274,4 +280,4 @@ export default function MessagesPage() {
       </div>
     </div>
   );
-} 
+}

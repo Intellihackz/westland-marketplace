@@ -1,3 +1,4 @@
+// Start of Selection
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -144,8 +145,8 @@ export default function PaymentsPage() {
                   className="border rounded-lg overflow-hidden bg-card"
                 >
                   <div className="p-6">
-                    <div className="flex items-start gap-6">
-                      <div className="relative w-24 h-24 flex-shrink-0">
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                      <div className="relative w-full h-48 sm:w-24 sm:h-24 flex-shrink-0 mb-4 sm:mb-0">
                         <Image
                           src={payment.listing.image}
                           alt={payment.listing.title}
@@ -159,7 +160,7 @@ export default function PaymentsPage() {
                           {payment.listing.title}
                         </h3>
                         
-                        <div className="grid grid-cols-2 gap-4 mt-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mt-4">
                           <div>
                             <p className="text-sm text-gray-500 dark:text-gray-400">Amount</p>
                             <p className="font-medium">₦{payment.amount.toLocaleString()}</p>
@@ -185,7 +186,7 @@ export default function PaymentsPage() {
                         </div>
 
                         {(canRelease || canRefund) && (
-                          <div className="mt-6 flex gap-4">
+                          <div className="mt-6 flex flex-col sm:flex-row gap-4">
                             {canRelease && (
                               <>
                                 <button
@@ -231,4 +232,5 @@ export default function PaymentsPage() {
       </div>
     </div>
   );
-} 
+}
+// End of Selectio

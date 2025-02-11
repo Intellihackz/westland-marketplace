@@ -116,7 +116,7 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-background/80 backdrop-blur-sm"
@@ -124,177 +124,202 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
       />
 
       {/* Modal */}
-      <div className="relative z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border bg-background p-6 shadow-lg">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Create New Listing</h2>
-          <button
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            ×
-          </button>
+      <div className="relative z-50 w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto bg-background rounded-t-lg sm:rounded-lg border shadow-lg safe-bottom">
+        <div className="sticky top-0 bg-background border-b z-10">
+          {/* Mobile drag indicator */}
+          <div className="w-12 h-1.5 bg-muted rounded-full mx-auto my-3 sm:hidden" />
+          
+          <div className="flex justify-between items-center px-6 pb-4">
+            <h2 className="text-xl font-semibold">Create New Listing</h2>
+            <button
+              onClick={onClose}
+              className="p-2 -m-2 text-muted-foreground hover:text-foreground"
+              aria-label="Close modal"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
-        {error && (
-          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium mb-2">
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              required
-              className="w-full rounded-lg border border-input px-3 py-2"
-              placeholder="What are you selling?"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium mb-2">
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              required
-              rows={4}
-              className="w-full rounded-lg border border-input px-3 py-2"
-              placeholder="Describe your item..."
-            />
-          </div>
-
-          <div>
-            <label htmlFor="price" className="block text-sm font-medium mb-2">
-              Price (₦)
-            </label>
-            <input
-              type="number"
-              id="price"
-              name="price"
-              required
-              min="0"
-              className="w-full rounded-lg border border-input px-3 py-2"
-              placeholder="0.00"
-              
-            />
-          </div>
-
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium mb-2">
-              Category
-            </label>
-            <select
-              id="category"
-              name="category"
-              required
-              className="w-full rounded-lg border border-input px-3 py-2"
-            >
-              <option value="">Select a category</option>
-              <option value="Textbooks">Textbooks</option>
-              <option value="Electronics">Electronics</option>
-              <option value="Furniture">Furniture</option>
-              <option value="Notes">Notes</option>
-              <option value="Clothing">Clothing</option>
-              <option value="Sports">Sports</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="condition" className="block text-sm font-medium mb-2">
-              Condition
-            </label>
-            <select
-              id="condition"
-              name="condition"
-              required
-              className="w-full rounded-lg border border-input px-3 py-2"
-            >
-              <option value="">Select condition</option>
-              <option value="new">New</option>
-              <option value="like-new">Like New</option>
-              <option value="good">Good</option>
-              <option value="fair">Fair</option>
-              <option value="poor">Poor</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="images" className="block text-sm font-medium mb-2">
-              Images
-            </label>
-            {images.length > 0 && <ImagePreviews />}
-            <input
-              type="file"
-              id="images"
-              name="images"
-              multiple
-              accept="image/*"
-              required={images.length === 0}
-              onChange={handleImageChange}
-              className="w-full rounded-lg border border-input px-3 py-2"
-            />
-            <p className="text-sm text-muted-foreground mt-1">
-              Upload up to 4 images. First image will be the cover.
-            </p>
-          </div>
-
-          <div>
-            <label htmlFor="tags" className="block text-sm font-medium mb-2">
-              Tags
-            </label>
-            <div className="flex flex-wrap gap-2 mb-2">
-              {tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-secondary px-2 py-1 rounded-full text-sm flex items-center gap-1"
-                >
-                  {tag}
-                  <button
-                    type="button"
-                    onClick={() => setTags(tags.filter((t) => t !== tag))}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+        <div className="p-6 pt-4">
+          {error && (
+            <div className="bg-destructive/10 text-destructive text-sm p-4 rounded-lg mb-6">
+              {error}
             </div>
-            <input
-              type="text"
-              id="tags"
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              onKeyDown={handleTagKeyDown}
-              className="w-full rounded-lg border border-input px-3 py-2"
-              placeholder="Add tags (press Enter or comma to add)"
-            />
-          </div>
+          )}
 
-          <div className="flex gap-4 justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 rounded-lg border border-input hover:bg-secondary"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50"
-            >
-              {loading ? 'Creating...' : 'Create Listing'}
-            </button>
-          </div>
-        </form>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium mb-2">
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                required
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2"
+                placeholder="What are you selling?"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium mb-2">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                required
+                rows={4}
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2"
+                placeholder="Describe your item..."
+              />
+            </div>
+
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium mb-2">
+                Price (₦)
+              </label>
+              <input
+                type="number"
+                id="price"
+                name="price"
+                required
+                min="0"
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2"
+                placeholder="0.00"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="category" className="block text-sm font-medium mb-2">
+                Category
+              </label>
+              <select
+                id="category"
+                name="category"
+                required
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+              >
+                <option value="">Select a category</option>
+                <option value="Textbooks">Textbooks</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Furniture">Furniture</option>
+                <option value="Notes">Notes</option>
+                <option value="Clothing">Clothing</option>
+                <option value="Sports">Sports</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="condition" className="block text-sm font-medium mb-2">
+                Condition
+              </label>
+              <select
+                id="condition"
+                name="condition"
+                required
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 bg-background"
+              >
+                <option value="">Select condition</option>
+                <option value="new">New</option>
+                <option value="like-new">Like New</option>
+                <option value="good">Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="images" className="block text-sm font-medium mb-2">
+                Images
+              </label>
+              {images.length > 0 && <ImagePreviews />}
+              <div className="relative">
+                <input
+                  type="file"
+                  id="images"
+                  name="images"
+                  multiple
+                  accept="image/*"
+                  required={images.length === 0}
+                  onChange={handleImageChange}
+                  className="w-full rounded-lg border border-input px-4 py-3 sm:py-2 file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0 file:text-sm file:font-medium
+                    file:bg-muted file:text-foreground hover:file:bg-muted/80"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">
+                Upload up to 4 images. First image will be the cover.
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="tags" className="block text-sm font-medium mb-2">
+                Tags
+              </label>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-muted"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                      className="ml-2 hover:text-destructive"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
+              <input
+                type="text"
+                id="tags"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagKeyDown}
+                className="w-full rounded-lg border border-input px-4 py-3 sm:py-2"
+                placeholder="Add tags (press Enter or comma to add)"
+              />
+            </div>
+
+            <div className="sticky bottom-0 -mx-6 -mb-6 p-6 bg-background border-t">
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-full px-4 py-3 sm:py-2 rounded-lg border hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full px-4 py-3 sm:py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? 'Creating...' : 'Create Listing'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );
