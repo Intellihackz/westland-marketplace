@@ -1,55 +1,43 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/context/AuthContext';
 import { Listing } from '@/lib/types/listing';
 import { Navigation } from '@/components/Navigation';
 import { ContactSellerModal } from '@/components/ContactSellerModal';
-import { BuyNowModal } from '@/components/BuyNowModal';
+import { BuyNowButton } from '@/components/BuyNowButton';
 import { EditListingModal } from '@/components/EditListingModal';
 
 export default function ListingPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { user } = useAuth();
   const [listing, setListing] = useState<Listing | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [isBuyModalOpen, setIsBuyModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  const fetchListing = useCallback(async () => {
-    try {
-      const res = await fetch(`/api/listings/${params.id}`);
-      if (!res.ok) {
-        throw new Error('Failed to fetch listing');
-      }
-      const data = await res.json();
-      setListing(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
-    } finally {
-      setLoading(false);
-    }
-  }, [params.id]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchListing();
-  }, [params.id, fetchListing]);
+    const fetchListing = async () => {
+      try {
+        const res = await fetch(`/api/listings/${params.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          setListing(data);
+        } else {
+          const data = await res.json();
+          setError(data.error || 'Failed to fetch listing');
+        }
+      } catch (error) {
+        console.error('Failed to fetch listing:', error);
+        setError('Failed to fetch listing');
+      }
+    };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen">
-        <Navigation />
-        <div className="flex items-center justify-center flex-1 h-[calc(100vh-64px)]">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-foreground"></div>
-        </div>
-      </div>
-    );
-  }
+    fetchListing();
+  }, [params.id]);
 
   if (error || !listing) {
     return (
@@ -114,41 +102,41 @@ export default function ListingPage({ params }: { params: { id: string } }) {
           </div>
 
           {/* Listing Details */}
-          <div className="space-y-6">
-            <div>
-              <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-bold">{listing.title}</h1>
-                <span className={`px-3 py-1 rounded-full text-sm ${
-                  listing.status === 'active' 
-                    ? 'bg-green-100 text-green-800'
-                    : listing.status === 'sold'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {listing.status.charAt(0).toUpperCase() + listing.status.slice(1)}
-                </span>
-              </div>
-              <p className="text-2xl font-semibold mt-2">₦{listing.price.toLocaleString()}</p>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="bg-secondary px-3 py-1 rounded-full text-sm">
-                {listing.category}
-              </div>
-              <div className="bg-secondary px-3 py-1 rounded-full text-sm">
-                {listing.condition}
-              </div>
-            </div>
-
-            <div>
+          <div>
+            <h1 className="text-2xl font-bold mb-2">{listing.title}</h1>
+            <p className="text-3xl font-bold mb-4">₦{listing.price.toLocaleString()}</p>
+            
+            <div className="mb-6">
               <h2 className="text-lg font-semibold mb-2">Description</h2>
-              <p className="text-muted-foreground whitespace-pre-wrap">
-                {listing.description}
-              </p>
+              <p className="whitespace-pre-wrap">{listing.description}</p>
+            </div>
+
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold mb-2">Details</h2>
+              <dl className="grid grid-cols-2 gap-4">
+                <div>
+                  <dt className="text-sm text-muted-foreground">Category</dt>
+                  <dd className="font-medium">{listing.category}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground">Condition</dt>
+                  <dd className="font-medium capitalize">{listing.condition}</dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground">Listed</dt>
+                  <dd className="font-medium">
+                    {new Date(listing.createdAt).toLocaleDateString()}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-sm text-muted-foreground">Status</dt>
+                  <dd className="font-medium capitalize">{listing.status}</dd>
+                </div>
+              </dl>
             </div>
 
             {listing.tags.length > 0 && (
-              <div>
+              <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-2">Tags</h2>
                 <div className="flex flex-wrap gap-2">
                   {listing.tags.map((tag) => (
@@ -190,7 +178,7 @@ export default function ListingPage({ params }: { params: { id: string } }) {
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ status: 'sold' }),
                             });
-                            fetchListing();
+                            router.refresh();
                           }
                         }}
                         className="w-full px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
@@ -203,12 +191,10 @@ export default function ListingPage({ params }: { params: { id: string } }) {
                   <div className="mt-4 space-y-2">
                     {listing.status === 'active' && (
                       <>
-                        <button
-                          onClick={() => setIsBuyModalOpen(true)}
+                        <BuyNowButton
+                          listing={listing}
                           className="w-full px-4 py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90"
-                        >
-                          Buy Now
-                        </button>
+                        />
                         <button
                           onClick={() => setIsContactModalOpen(true)}
                           className="w-full px-4 py-2 rounded-lg border border-input hover:bg-secondary"
@@ -242,12 +228,6 @@ export default function ListingPage({ params }: { params: { id: string } }) {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
         listing={listing}
-      />
-      <BuyNowModal
-        isOpen={isBuyModalOpen}
-        onClose={() => setIsBuyModalOpen(false)}
-        listing={listing}
-        onSuccess={fetchListing}
       />
     </div>
   );

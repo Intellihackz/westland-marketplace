@@ -11,14 +11,6 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const token = cookies().get('auth-token')?.value;
-    if (!token) {
-      return NextResponse.json(
-        { error: "Not authenticated" },
-        { status: 401 }
-      );
-    }
-
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
         { error: "Invalid user ID" },
@@ -26,13 +18,27 @@ export async function GET(
       );
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     const client = await clientPromise;
     const db = client.db("unimarket");
 
+    // Get the auth token to determine if this is the user's own profile
+    const token = cookies().get('auth-token')?.value;
+    const isOwnProfile = token ? 
+      (jwt.verify(token, JWT_SECRET) as { userId: string }).userId === params.id 
+      : false;
+
+    // Define which fields to return based on whether it's the user's own profile
+    const projection = isOwnProfile
+      ? { password: 0 } // Exclude only password for own profile
+      : {
+          password: 0,
+          email: 0,
+          phone: 0, // Hide private information for other users
+        };
+
     const user = await db.collection("users").findOne(
       { _id: new ObjectId(params.id) },
-      { projection: { password: 0 } } // Exclude password
+      { projection }
     );
 
     if (!user) {
@@ -46,7 +52,6 @@ export async function GET(
     const formattedUser = {
       ...user,
       _id: user._id.toString(),
-      // Ensure dates exist and are in ISO format, or use current date as fallback
       createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString(),
       updatedAt: user.updatedAt ? new Date(user.updatedAt).toISOString() : new Date().toISOString()
     };
@@ -55,8 +60,9 @@ export async function GET(
   } catch (error) {
     console.error("Get user error:", error);
     if (error instanceof jwt.JsonWebTokenError) {
+      // Continue with public profile view if token is invalid
       return NextResponse.json(
-        { error: "Invalid token" },
+        { error: "Invalid token, proceeding with public view" },
         { status: 401 }
       );
     }

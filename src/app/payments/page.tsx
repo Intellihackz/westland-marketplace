@@ -56,7 +56,7 @@ export default function PaymentsPage() {
   }, []);
 
   const handleRelease = async (paymentId: string) => {
-    if (!confirm('Are you sure you want to release the funds to the seller?')) {
+    if (!confirm('Are you sure you want to release the funds to the seller? This action cannot be undone.')) {
       return;
     }
 
@@ -83,7 +83,7 @@ export default function PaymentsPage() {
   };
 
   const handleRefund = async (paymentId: string) => {
-    if (!confirm('Are you sure you want to refund this payment?')) {
+    if (!confirm('Are you sure you want to refund this payment? This action cannot be undone.')) {
       return;
     }
 
@@ -187,20 +187,36 @@ export default function PaymentsPage() {
                         {(canRelease || canRefund) && (
                           <div className="mt-6 flex gap-4">
                             {canRelease && (
-                              <button
-                                onClick={() => handleRelease(payment._id)}
-                                className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                              >
-                                Release Funds to Seller
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => handleRelease(payment._id)}
+                                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                >
+                                  Item Received
+                                </button>
+                                <button
+                                  onClick={() => alert('Please contact support if you have not received your item.')}
+                                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                >
+                                  Not Received
+                                </button>
+                              </>
                             )}
                             {canRefund && (
-                              <button
-                                onClick={() => handleRefund(payment._id)}
-                                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                              >
-                                Refund Payment
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => handleRelease(payment._id)}
+                                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                >
+                                  Item's Been Delivered
+                                </button>
+                                <button
+                                  onClick={() => handleRefund(payment._id)}
+                                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                >
+                                  Not Delivered
+                                </button>
+                              </>
                             )}
                           </div>
                         )}
