@@ -32,4 +32,6 @@ export async function GET() {
     console.error("Session error:", error);
     return NextResponse.json({ user: null });
   }
-} 
+}
+
+export const dynamic = 'force-dynamic'; 

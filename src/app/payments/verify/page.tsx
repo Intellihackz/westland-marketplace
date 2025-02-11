@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Navigation } from '@/components/Navigation';
 
-export default function PaymentVerificationPage() {
+function PaymentVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
@@ -119,5 +119,13 @@ export default function PaymentVerificationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PaymentVerificationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentVerificationContent />
+    </Suspense>
   );
 } 

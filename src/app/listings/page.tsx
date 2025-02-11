@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Navigation } from '@/components/Navigation';
@@ -37,7 +37,7 @@ const priceRanges = [
   { label: 'Over ₦50,000', min: 50000, max: undefined },
 ];
 
-export default function ListingsPage() {
+function ListingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [listings, setListings] = useState<Listing[]>([]);
@@ -427,5 +427,13 @@ export default function ListingsPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function ListingsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ListingsContent />
+    </Suspense>
   );
 } 
