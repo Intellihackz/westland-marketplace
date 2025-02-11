@@ -165,7 +165,12 @@ export default function ListingPage({ params }: { params: { id: string } }) {
 
             <div className="border-t pt-6">
               <h2 className="text-lg font-semibold mb-2">Seller</h2>
-              <p className="text-muted-foreground">{listing.seller.name}</p>
+              <button
+                onClick={() => router.push(`/users/${listing.seller._id}`)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                {listing.seller.name}
+              </button>
               
               {user ? (
                 isOwner ? (

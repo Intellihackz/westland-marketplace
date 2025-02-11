@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from "@/lib/hooks/useAuth";
 import { CreateListingModal } from './CreateListingModal';
@@ -9,6 +9,31 @@ export function Navigation() {
   const router = useRouter();
   const { user, logout, loading } = useAuth();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUnreadCount = async () => {
+      if (!user) return;
+      try {
+        const res = await fetch('/api/messages');
+        if (res.ok) {
+          const data = await res.json();
+          const totalUnread = data.conversations.reduce(
+            (sum: number, conv: { unreadCount: number }) => sum + conv.unreadCount,
+            0
+          );
+          setUnreadCount(totalUnread);
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+    // Poll for new messages every minute
+    const interval = setInterval(fetchUnreadCount, 60000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   return (
     <>
@@ -28,6 +53,23 @@ export function Navigation() {
                 <div className="h-10 w-24 bg-muted animate-pulse rounded-full" />
               ) : user ? (
                 <>
+                  <button
+                    onClick={() => router.push('/messages')}
+                    className="px-4 py-2 rounded-full border border-foreground/10 hover:bg-secondary transition-colors relative"
+                  >
+                    Messages
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full min-w-[1.25rem]">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => router.push('/payments')}
+                    className="px-4 py-2 rounded-full border border-foreground/10 hover:bg-secondary transition-colors"
+                  >
+                    Payments
+                  </button>
                   <button
                     onClick={() => router.push('/profile')}
                     className="px-4 py-2 rounded-full border border-foreground/10 hover:bg-secondary transition-colors"

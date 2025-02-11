@@ -19,6 +19,13 @@ export async function GET(
       );
     }
 
+    if (!ObjectId.isValid(params.id)) {
+      return NextResponse.json(
+        { error: "Invalid user ID" },
+        { status: 400 }
+      );
+    }
+
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
     const client = await clientPromise;
     const db = client.db("unimarket");
@@ -35,9 +42,24 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(user);
+    // Format the user data for the client
+    const formattedUser = {
+      ...user,
+      _id: user._id.toString(),
+      // Ensure dates exist and are in ISO format, or use current date as fallback
+      createdAt: user.createdAt ? new Date(user.createdAt).toISOString() : new Date().toISOString(),
+      updatedAt: user.updatedAt ? new Date(user.updatedAt).toISOString() : new Date().toISOString()
+    };
+
+    return NextResponse.json(formattedUser);
   } catch (error) {
     console.error("Get user error:", error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return NextResponse.json(
+        { error: "Invalid token" },
+        { status: 401 }
+      );
+    }
     return NextResponse.json(
       { error: "Something went wrong" },
       { status: 500 }
@@ -82,17 +104,50 @@ export async function PUT(
       Object.entries(updates).filter(([key]) => allowedUpdates.includes(key))
     );
 
-    await db.collection("users").updateOne(
+    // Add timestamps
+    const now = new Date();
+    const updateResult = await db.collection("users").updateOne(
       { _id: new ObjectId(params.id) },
       { 
         $set: {
           ...filteredUpdates,
-          updatedAt: new Date()
+          updatedAt: now
+        },
+        $setOnInsert: {
+          createdAt: now
         }
       }
     );
 
-    return NextResponse.json({ message: "Profile updated successfully" });
+    if (!updateResult.matchedCount) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get updated user data
+    const updatedUser = await db.collection("users").findOne(
+      { _id: new ObjectId(params.id) },
+      { projection: { password: 0 } }
+    );
+
+    if (!updatedUser) {
+      return NextResponse.json(
+        { error: "Failed to fetch updated user data" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      message: "Profile updated successfully",
+      user: {
+        ...updatedUser,
+        _id: updatedUser._id.toString(),
+        createdAt: updatedUser.createdAt ? new Date(updatedUser.createdAt).toISOString() : now.toISOString(),
+        updatedAt: updatedUser.updatedAt ? new Date(updatedUser.updatedAt).toISOString() : now.toISOString()
+      }
+    });
   } catch (error) {
     console.error("Update user error:", error);
     return NextResponse.json(

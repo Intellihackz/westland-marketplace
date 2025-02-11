@@ -9,14 +9,16 @@ interface EditProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   user: UserProfile;
+  onUpdate: (user: UserProfile) => void;
 }
 
-export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProps) {
+export function EditProfileModal({ isOpen, onClose, user, onUpdate }: EditProfileModalProps) {
   const [name, setName] = useState(user.name);
   const [phone, setPhone] = useState(user.phone || '');
   const [bio, setBio] = useState(user.bio || '');
   const [avatar, setAvatar] = useState(user.avatar);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,6 +65,7 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
     try {
       const res = await fetch('/api/users/profile', {
@@ -71,12 +74,17 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
         body: JSON.stringify({ name, phone, bio, avatar }),
       });
 
-      if (!res.ok) throw new Error('Failed to update profile');
+      const data = await res.json();
 
-      onClose();
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to update profile');
+      }
+
+      // Update the user context with the new data
+      onUpdate(data.user);
     } catch (error) {
       console.error('Failed to update profile:', error);
-      alert('Failed to update profile. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to update profile');
     } finally {
       setIsSubmitting(false);
     }
@@ -95,7 +103,8 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
             <h2 className="text-xl font-semibold">Edit Profile</h2>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              disabled={isSubmitting}
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 disabled:opacity-50"
             >
               <svg
                 className="w-6 h-6"
@@ -112,6 +121,12 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
               </svg>
             </button>
           </div>
+
+          {error && (
+            <div className="mb-4 p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col items-center mb-6">
@@ -132,13 +147,14 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 )}
               </div>
               <label className="cursor-pointer">
-                <span className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
                   Change Avatar
                 </span>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleAvatarChange}
+                  disabled={isSubmitting}
                   className="hidden"
                 />
               </label>
@@ -156,8 +172,9 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                disabled={isSubmitting}
                 required
-                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 disabled:opacity-50"
               />
             </div>
 
@@ -173,7 +190,8 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                disabled={isSubmitting}
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 disabled:opacity-50"
               />
             </div>
 
@@ -188,8 +206,9 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
                 id="bio"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
+                disabled={isSubmitting}
                 rows={3}
-                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600"
+                className="w-full px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 disabled:opacity-50"
               />
             </div>
 
@@ -197,7 +216,8 @@ export function EditProfileModal({ isOpen, onClose, user }: EditProfileModalProp
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700"
+                disabled={isSubmitting}
+                className="px-4 py-2 text-sm rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50"
               >
                 Cancel
               </button>
