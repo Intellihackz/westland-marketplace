@@ -2,22 +2,22 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { AuthProvider } from "@/lib/context/AuthContext";
-
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Westplace - Westland University Marketplace",
-  description: "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
-  keywords: ["marketplace", "university", "student", "westland", "buy", "sell", "textbooks", "electronics"],
+  description:
+    "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
+  keywords: [
+    "marketplace",
+    "university",
+    "student",
+    "westland",
+    "buy",
+    "sell",
+    "textbooks",
+    "electronics",
+  ],
   authors: [{ name: "Westland University" }],
   creator: "Westland University",
   publisher: "Westland University",
@@ -28,7 +28,8 @@ export const metadata: Metadata = {
     url: "https://westplace.westland.edu",
     siteName: "Westplace",
     title: "Westplace - Westland University Marketplace",
-    description: "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
+    description:
+      "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
     images: [
       {
         url: "/logo.jpg",
@@ -41,7 +42,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Westplace - Westland University Marketplace",
-    description: "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
+    description:
+      "The official marketplace for Westland University students and staff. Buy and sell textbooks, electronics, furniture, and more.",
     images: ["/logo.jpg"],
   },
   robots: {
@@ -54,7 +56,7 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
-  }
+  },
 };
 
 export default function RootLayout({
@@ -64,10 +66,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <AuthProvider>{children}</AuthProvider>
+      <body>
+        <AuthProvider>
+          {children}
+          <Analytics />
+        </AuthProvider>
       </body>
     </html>
   );
