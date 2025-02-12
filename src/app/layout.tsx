@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   authors: [{ name: "Westland University" }],
   creator: "Westland University",
   publisher: "Westland University",
-  metadataBase: new URL("https://westplace.westland.edu"),
+  metadataBase: new URL("https://westplace.vercel.app"),
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://westplace.westland.edu",
+    url: "https://westplace.vercel.app",
     siteName: "Westplace",
     title: "Westplace - Westland University Marketplace",
     description:
