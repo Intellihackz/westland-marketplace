@@ -55,11 +55,11 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <section className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4">
-            Buy and sell within your university
+          <h2 className="text-4xl font-bold mb-4 text-primary">
+            Westland University Marketplace
           </h2>
           <p className="text-muted-foreground mb-8">
-            A safe and easy way to trade with fellow students
+            Buy and sell with your fellow Westland students
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <form onSubmit={handleSearch} className="flex gap-4 justify-center w-full max-w-md">
@@ -72,7 +72,7 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="px-6 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90"
+                className="px-6 py-2 rounded-full bg-primary text-background hover:bg-primary/90"
               >
                 Search
               </button>
@@ -96,7 +96,7 @@ export default function Home() {
                 }}
                 className={`p-4 rounded-lg border transition-colors cursor-pointer ${
                   selectedCategory === category
-                    ? 'bg-foreground text-background hover:bg-foreground/90'
+                    ? 'bg-primary text-background hover:bg-primary/90'
                     : 'bg-card hover:border-foreground/20'
                 }`}
               >
@@ -180,7 +180,7 @@ export default function Home() {
       <footer className="border-t mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <p className="text-center text-muted-foreground">
-            © 2024 UniMarket. All rights reserved.
+            © 2024 Westplace - Westland University. All rights reserved.
           </p>
         </div>
       </footer>

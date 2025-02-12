@@ -110,7 +110,7 @@ export default function MessagesPage() {
       <Navigation />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold mb-8">Messages</h1>
+        <h1 className="text-2xl font-bold mb-8 text-primary">Messages</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Conversations List */}
@@ -125,9 +125,9 @@ export default function MessagesPage() {
                   <button
                     key={conversation._id}
                     onClick={() => setSelectedConversation(conversation)}
-                    className={`w-full p-4 text-left hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                    className={`w-full p-4 text-left hover:bg-secondary/10 ${
                       selectedConversation?._id === conversation._id
-                        ? 'bg-gray-100 dark:bg-gray-800'
+                        ? 'bg-secondary/20'
                         : ''
                     }`}
                   >
@@ -139,6 +139,13 @@ export default function MessagesPage() {
                           fill
                           className="object-cover rounded-lg"
                         />
+                        {conversation.listing.status !== 'active' && (
+                          <div className="absolute inset-0 bg-background/60 flex items-center justify-center rounded-lg">
+                            <span className="text-xs font-medium text-destructive">
+                              Closed
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium truncate">
@@ -152,7 +159,7 @@ export default function MessagesPage() {
                         </p>
                       </div>
                       {conversation.unreadCount > 0 && (
-                        <div className="ml-2 bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full">
+                        <div className="ml-2 bg-primary text-white text-xs font-medium px-2 py-1 rounded-full">
                           {conversation.unreadCount}
                         </div>
                       )}
@@ -171,7 +178,7 @@ export default function MessagesPage() {
                 <div className="p-4 border-b flex items-center">
                   <button
                     onClick={() => setSelectedConversation(null)}
-                    className="mr-4 text-blue-500 md:hidden"
+                    className="mr-4 text-primary md:hidden"
                   >
                     &larr;
                   </button>
@@ -188,9 +195,16 @@ export default function MessagesPage() {
                       <h2 className="font-medium">
                         {selectedConversation.listing.title}
                       </h2>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        ₦{selectedConversation.listing.price.toLocaleString()}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">
+                          ₦{selectedConversation.listing.price.toLocaleString()}
+                        </p>
+                        {selectedConversation.listing.status !== 'active' && (
+                          <span className="text-xs px-2 py-0.5 bg-destructive/10 text-destructive rounded-full">
+                            Closed
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -232,8 +246,8 @@ export default function MessagesPage() {
                             <div
                               className={`rounded-lg p-3 ${
                                 isOwnMessage
-                                  ? 'bg-blue-500 text-white'
-                                  : 'bg-gray-100 dark:bg-gray-800'
+                                  ? 'bg-primary text-white'
+                                  : 'bg-secondary/20'
                               }`}
                             >
                               <p className="text-sm whitespace-pre-wrap">
@@ -257,17 +271,25 @@ export default function MessagesPage() {
                       type="text"
                       value={newMessage}
                       onChange={e => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
-                      className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
+                      placeholder={selectedConversation.listing.status === 'active' 
+                        ? "Type a message..." 
+                        : "This listing is no longer active"}
+                      className="flex-1 rounded-lg border border-input px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                      disabled={selectedConversation.listing.status !== 'active'}
                     />
                     <button
                       type="submit"
-                      disabled={!newMessage.trim()}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!newMessage.trim() || selectedConversation.listing.status !== 'active'}
+                      className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Send
                     </button>
                   </div>
+                  {selectedConversation.listing.status !== 'active' && (
+                    <p className="mt-2 text-sm text-destructive text-center">
+                      This listing is no longer active. You cannot send new messages.
+                    </p>
+                  )}
                 </form>
               </>
             ) : (

@@ -15,8 +15,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "UniMarket - Your University Marketplace",
-  description: "Buy and sell items within your university community",
+  title: "Westplace - Westland University Marketplace",
+  description: "The official marketplace for Westland University students and staff",
 };
 
 export default function RootLayout({

@@ -130,7 +130,7 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
           <div className="w-12 h-1.5 bg-muted rounded-full mx-auto my-3 sm:hidden" />
           
           <div className="flex justify-between items-center px-6 pb-4">
-            <h2 className="text-xl font-semibold">Create New Listing</h2>
+            <h2 className="text-xl font-semibold text-primary">Create New Listing</h2>
             <button
               onClick={onClose}
               className="p-2 -m-2 text-muted-foreground hover:text-foreground"
@@ -312,9 +312,9 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-3 sm:py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 transition-colors"
+                  className="w-full py-3 sm:py-2 rounded-lg bg-primary text-background hover:bg-primary/90 font-medium disabled:opacity-50"
                 >
-                  {loading ? 'Creating...' : 'Create Listing'}
+                  {loading ? "Creating..." : "Create Listing"}
                 </button>
               </div>
             </div>

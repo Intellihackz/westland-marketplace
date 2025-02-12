@@ -126,7 +126,7 @@ export default function PaymentsPage() {
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold mb-8">Payments</h1>
+        <h1 className="text-2xl font-bold mb-8 text-primary">Payments</h1>
         
         {payments.length === 0 ? (
           <div className="text-center text-gray-500">
@@ -191,13 +191,13 @@ export default function PaymentsPage() {
                               <>
                                 <button
                                   onClick={() => handleRelease(payment._id)}
-                                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
                                 >
                                   Item Received
                                 </button>
                                 <button
                                   onClick={() => alert('Please contact support if you have not received your item.')}
-                                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                  className="flex-1 px-4 py-2 bg-destructive text-white rounded-lg hover:bg-destructive/90"
                                 >
                                   Not Received
                                 </button>
@@ -207,13 +207,13 @@ export default function PaymentsPage() {
                               <>
                                 <button
                                   onClick={() => handleRelease(payment._id)}
-                                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                  className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
                                 >
                                   Item's Been Delivered
                                 </button>
                                 <button
                                   onClick={() => handleRefund(payment._id)}
-                                  className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                  className="flex-1 px-4 py-2 bg-destructive text-white rounded-lg hover:bg-destructive/90"
                                 >
                                   Not Delivered
                                 </button>

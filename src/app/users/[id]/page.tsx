@@ -139,13 +139,13 @@ export default function UserProfilePage() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-64px)]">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4">Profile Not Found</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <h2 className="text-xl font-semibold mb-4 text-primary">Profile Not Found</h2>
+            <p className="text-muted-foreground mb-4">
               The requested profile could not be found.
             </p>
             <button
               onClick={() => router.push("/")}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
             >
               Go Home
             </button>
@@ -181,36 +181,36 @@ export default function UserProfilePage() {
             )}
 
             <div className="flex-1">
-              <h1 className="text-2xl font-bold">{profile.name}</h1>
+              <h1 className="text-2xl font-bold text-primary">{profile.name}</h1>
               {isOwnProfile && (
                 <>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-muted-foreground">
                     {profile.email}
                   </p>
                   {profile.phone && (
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <p className="text-muted-foreground">
                       {profile.phone}
                     </p>
                   )}
                   {salesData && (
                     <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Sales</p>
+                      <div className="bg-card p-4 rounded-lg border">
+                        <p className="text-sm text-muted-foreground">Total Sales</p>
                         <p className="text-xl font-bold">₦{salesData.totalSales.toLocaleString()}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {salesData.completedSales} completed
                         </p>
                         <button
                           onClick={() => setIsWithdrawModalOpen(true)}
-                          className="mt-2 w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+                          className="mt-2 w-full px-3 py-1.5 text-sm text-white bg-primary hover:bg-primary/90 rounded-lg"
                         >
                           Withdraw
                         </button>
                       </div>
-                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                      <div className="bg-card p-4 rounded-lg border">
+                        <p className="text-sm text-muted-foreground">Pending</p>
                         <p className="text-xl font-bold">₦{salesData.pendingAmount.toLocaleString()}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-sm text-muted-foreground">
                           {salesData.pendingSales} in escrow
                         </p>
                       </div>
@@ -224,7 +224,7 @@ export default function UserProfilePage() {
               <div className="flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => setIsEditModalOpen(true)}
-                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg border hover:bg-secondary/10"
                 >
                   Edit Profile
                 </button>
@@ -233,7 +233,7 @@ export default function UserProfilePage() {
                     await logout();
                     router.push('/');
                   }}
-                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-destructive text-white hover:bg-destructive/90"
                 >
                   Sign Out
                 </button>
@@ -242,7 +242,7 @@ export default function UserProfilePage() {
           </div>
 
           {profile.bio && (
-            <p className="mt-4 text-gray-600 dark:text-gray-400">
+            <p className="mt-4 text-muted-foreground">
               {profile.bio}
             </p>
           )}

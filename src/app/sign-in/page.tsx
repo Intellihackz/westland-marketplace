@@ -60,13 +60,13 @@ export default function SignIn() {
       <div className="min-h-[calc(100vh-64px)] flex items-center justify-center px-4">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold">
-              {isSignIn ? "Sign in to UniMarket" : "Create your account"}
+            <h2 className="mt-6 text-3xl font-bold text-primary">
+              {isSignIn ? "Sign in to Westplace" : "Join Westplace"}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               {isSignIn 
-                ? "Use your university email to sign in" 
-                : "Please use your university email address"}
+                ? "Use your Westland University email to sign in" 
+                : "Please use your Westland University email address"}
             </p>
           </div>
 
@@ -103,7 +103,7 @@ export default function SignIn() {
                   type="email"
                   required
                   className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-input placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                  placeholder="example@gmail.com"
+                  placeholder="example@westland.edu"
                 />
               </div>
               <div>
@@ -135,7 +135,7 @@ export default function SignIn() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-background bg-foreground hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-background bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Loading...' : (isSignIn ? "Sign in" : "Create account")}
               </button>

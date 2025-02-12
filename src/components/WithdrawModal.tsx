@@ -65,7 +65,7 @@ export function WithdrawModal({ isOpen, onClose, availableAmount, onWithdraw }: 
       />
       
       <div className="relative z-50 w-full max-w-md bg-background rounded-lg border shadow-lg p-6">
-        <h2 className="text-xl font-semibold mb-4">Withdraw Funds</h2>
+        <h2 className="text-xl font-semibold mb-4 text-primary">Withdraw Funds</h2>
 
         {error && (
           <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
@@ -137,7 +137,7 @@ export function WithdrawModal({ isOpen, onClose, availableAmount, onWithdraw }: 
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 rounded-lg bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-primary text-background hover:bg-primary/90 disabled:opacity-50"
             >
               {loading ? 'Processing...' : 'Withdraw'}
             </button>

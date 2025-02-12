@@ -46,9 +46,10 @@ export function Navigation() {
             <div className="flex items-center">
               <button 
                 onClick={() => router.push('/')}
-                className="text-xl font-bold hover:opacity-80"
+                className="text-xl font-bold hover:opacity-80 text-primary flex items-center gap-2"
               >
-                UniMarket
+                <img src="/logo.jpg" alt="Westland University" className="h-8 w-8" />
+                Westplace
               </button>
             </div>
 
@@ -92,7 +93,7 @@ export function Navigation() {
                   </button>
                   <button 
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="px-4 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors"
+                    className="px-4 py-2 rounded-full bg-primary text-background hover:bg-primary/90 transition-colors"
                   >
                     List Item
                   </button>
@@ -100,7 +101,7 @@ export function Navigation() {
               ) : (
                 <button
                   onClick={() => router.push('/sign-in')}
-                  className="px-4 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors"
+                  className="px-4 py-2 rounded-full bg-primary text-background hover:bg-primary/90 transition-colors"
                 >
                   Sign In
                 </button>
@@ -112,7 +113,7 @@ export function Navigation() {
               <div className="sm:hidden">
                 <button
                   onClick={() => router.push('/sign-in')}
-                  className="px-4 py-2 rounded-full bg-foreground text-background hover:bg-foreground/90 transition-colors"
+                  className="px-4 py-2 rounded-full bg-primary text-background hover:bg-primary/90 transition-colors"
                 >
                   Sign In
                 </button>
@@ -159,7 +160,7 @@ export function Navigation() {
               onClick={() => setIsCreateModalOpen(true)}
               className="flex flex-col items-center justify-center"
             >
-              <div className="w-12 h-12 bg-foreground text-background rounded-full flex items-center justify-center -mt-6 shadow-lg">
+              <div className="w-12 h-12 bg-primary text-background rounded-full flex items-center justify-center -mt-6 shadow-lg">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
