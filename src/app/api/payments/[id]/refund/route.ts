@@ -73,6 +73,17 @@ export async function POST(
       }
     );
 
+    // Update platform fee status back to pending
+    await db.collection('platform_fees').updateOne(
+      { listingId: payment.listingId },
+      {
+        $set: {
+          status: 'pending',
+          updatedAt: new Date()
+        }
+      }
+    );
+
     return NextResponse.json({
       message: 'Payment refunded successfully'
     });

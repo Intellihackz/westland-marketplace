@@ -70,6 +70,17 @@ export async function POST(
       }
     );
 
+    // Update platform fee status to collected
+    await db.collection('platform_fees').updateOne(
+      { listingId: payment.listingId },
+      {
+        $set: {
+          status: 'collected',
+          updatedAt: new Date()
+        }
+      }
+    );
+
     return NextResponse.json({
       message: 'Funds released to seller successfully'
     });

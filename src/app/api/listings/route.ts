@@ -43,11 +43,20 @@ export async function POST(req: Request) {
       );
     }
 
+    // Calculate platform fee (1%)
+    const platformFeePercentage = 0.01;
+    const maxPlatformFee = 1000; // Maximum platform fee capped at ₦1000
+    const calculatedFee = price * platformFeePercentage;
+    const platformFee = Math.min(calculatedFee, maxPlatformFee); // Cap the fee at ₦1000
+    const sellerAmount = price - platformFee;
+
     // Create listing
     const result = await db.collection("listings").insertOne({
       title,
       description,
       price,
+      platformFee,
+      sellerAmount,
       category,
       condition,
       images,
@@ -58,6 +67,16 @@ export async function POST(req: Request) {
         email: user.email,
       },
       status: 'active',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Track platform fee
+    await db.collection("platform_fees").insertOne({
+      listingId: result.insertedId,
+      sellerId: user._id,
+      amount: platformFee,
+      status: 'pending', // Will be updated to 'collected' when the item is sold
       createdAt: new Date(),
       updatedAt: new Date(),
     });

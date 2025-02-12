@@ -26,6 +26,7 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [deletingListingId, setDeletingListingId] = useState<string | null>(null);
 
   const isOwnProfile = user?._id === params.id;
 
@@ -119,6 +120,26 @@ export default function UserProfilePage() {
       }
     } catch (error) {
       throw error;
+    }
+  };
+
+  const handleDeleteListing = async (listingId: string) => {
+    try {
+      const response = await fetch(`/api/listings/${listingId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete listing');
+      }
+
+      // Remove the listing from state
+      setActiveListings(activeListings.filter(l => l._id !== listingId));
+      setDeletingListingId(null);
+    } catch (error) {
+      console.error('Failed to delete listing:', error);
+      alert('Failed to delete listing. Please try again.');
     }
   };
 
@@ -262,12 +283,8 @@ export default function UserProfilePage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {activeListings.map((listing) => (
-                  <button
-                    key={listing._id}
-                    onClick={() => router.push(`/listings/${listing._id}`)}
-                    className="rounded-lg border bg-white dark:bg-gray-800 overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-colors text-left"
-                  >
-                    <div className="aspect-square relative">
+                  <div key={listing._id} className="bg-card rounded-lg border overflow-hidden">
+                    <div className="relative aspect-square">
                       <Image
                         src={listing.images[0]}
                         alt={listing.title}
@@ -276,22 +293,27 @@ export default function UserProfilePage() {
                       />
                     </div>
                     <div className="p-4">
-                      <h4 className="font-medium mb-2 line-clamp-1">
-                        {listing.title}
-                      </h4>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
-                        {listing.description}
-                      </p>
+                      <h3 className="font-semibold mb-2">{listing.title}</h3>
+                      <p className="text-lg font-bold mb-2">₦{listing.price.toLocaleString()}</p>
                       <div className="flex justify-between items-center">
-                        <p className="font-bold">
-                          ₦{listing.price.toLocaleString()}
-                        </p>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {new Date(listing.createdAt).toLocaleDateString()}
-                        </span>
+                        <button
+                          onClick={() => router.push(`/listings/${listing._id}`)}
+                          className="text-sm text-primary hover:underline"
+                        >
+                          View Details
+                        </button>
+                        {isOwnProfile && (
+                          <button
+                            onClick={() => handleDeleteListing(listing._id)}
+                            disabled={deletingListingId === listing._id}
+                            className="text-sm text-destructive hover:text-destructive/90 disabled:opacity-50"
+                          >
+                            {deletingListingId === listing._id ? 'Deleting...' : 'Delete'}
+                          </button>
+                        )}
                       </div>
                     </div>
-                  </button>
+                  </div>
                 ))}
               </div>
             )}
@@ -308,41 +330,29 @@ export default function UserProfilePage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   {soldListings.map((listing) => (
-                    <button
-                      key={listing._id}
-                      onClick={() => router.push(`/listings/${listing._id}`)}
-                      className="rounded-lg border bg-white dark:bg-gray-800 overflow-hidden hover:border-gray-300 dark:hover:border-gray-600 transition-colors text-left opacity-75"
-                    >
-                      <div className="aspect-square relative">
+                    <div key={listing._id} className="bg-card rounded-lg border overflow-hidden opacity-75">
+                      <div className="relative aspect-square">
                         <Image
                           src={listing.images[0]}
                           alt={listing.title}
                           fill
                           className="object-cover"
                         />
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-sm font-medium text-white">
-                            Sold
-                          </span>
+                        <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+                          <span className="text-lg font-semibold">SOLD</span>
                         </div>
                       </div>
                       <div className="p-4">
-                        <h4 className="font-medium mb-2 line-clamp-1">
-                          {listing.title}
-                        </h4>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm mb-2 line-clamp-2">
-                          {listing.description}
-                        </p>
-                        <div className="flex justify-between items-center">
-                          <p className="font-bold">
-                            ₦{listing.price.toLocaleString()}
-                          </p>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {new Date(listing.createdAt).toLocaleDateString()}
-                          </span>
-                        </div>
+                        <h3 className="font-semibold mb-2">{listing.title}</h3>
+                        <p className="text-lg font-bold mb-2">₦{listing.price.toLocaleString()}</p>
+                        <button
+                          onClick={() => router.push(`/listings/${listing._id}`)}
+                          className="text-sm text-primary hover:underline"
+                        >
+                          View Details
+                        </button>
                       </div>
-                    </button>
+                    </div>
                   ))}
                 </div>
               )}

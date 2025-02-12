@@ -16,6 +16,21 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
   const [images, setImages] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [price, setPrice] = useState<number>(0);
+  const platformFeePercentage = 0.01; // 1% platform fee
+  const maxPlatformFee = 1000; // Maximum platform fee capped at ₦1000
+
+  const calculateFinalAmount = (price: number) => {
+    const calculatedFee = price * platformFeePercentage;
+    const platformFee = Math.min(calculatedFee, maxPlatformFee); // Cap the fee at ₦1000
+    const finalAmount = price - platformFee;
+    return { platformFee, finalAmount };
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newPrice = parseFloat(e.target.value) || 0;
+    setPrice(newPrice);
+  };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -199,9 +214,19 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
                 name="price"
                 required
                 min="0"
+                value={price}
+                onChange={handlePriceChange}
                 className="w-full rounded-lg border border-input px-4 py-3 sm:py-2"
                 placeholder="0.00"
               />
+              {price > 0 && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  <p>Platform fee (1%): ₦{calculateFinalAmount(price).platformFee.toFixed(2)}</p>
+                  <p className="font-medium text-foreground">
+                    You will receive: ₦{calculateFinalAmount(price).finalAmount.toFixed(2)}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div>
