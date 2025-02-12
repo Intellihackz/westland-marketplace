@@ -13,7 +13,7 @@ import { WithdrawModal } from '@/components/WithdrawModal';
 export default function UserProfilePage() {
   const router = useRouter();
   const params = useParams();
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeListings, setActiveListings] = useState<Listing[]>([]);
   const [soldListings, setSoldListings] = useState<Listing[]>([]);
@@ -221,12 +221,23 @@ export default function UserProfilePage() {
             </div>
 
             {isOwnProfile && (
-              <button
-                onClick={() => setIsEditModalOpen(true)}
-                className="w-full sm:w-auto px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                Edit Profile
-              </button>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  Edit Profile
+                </button>
+                <button
+                  onClick={async () => {
+                    await logout();
+                    router.push('/');
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700"
+                >
+                  Sign Out
+                </button>
+              </div>
             )}
           </div>
 

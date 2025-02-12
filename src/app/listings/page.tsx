@@ -45,6 +45,7 @@ function ListingsContent() {
   const [error, setError] = useState<string | null>(null);
   const [totalListings, setTotalListings] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
@@ -106,12 +107,63 @@ function ListingsContent() {
       <Navigation />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Browse Listings</h1>
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold">Browse Listings</h1>
+            
+            {/* View Toggle */}
+            <div className="hidden sm:flex border rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-2 ${
+                  viewMode === 'grid'
+                    ? 'bg-foreground text-background'
+                    : 'hover:bg-secondary'
+                }`}
+                aria-label="Grid view"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 ${
+                  viewMode === 'list'
+                    ? 'bg-foreground text-background'
+                    : 'hover:bg-secondary'
+                }`}
+                aria-label="List view"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
 
+          {/* Search and Filters */}
           <div className="relative">
-            {/* Search and Filter Bar */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-2">
               <form onSubmit={handleSearch} className="flex-1 flex gap-2">
                 <input
@@ -295,55 +347,120 @@ function ListingsContent() {
           </div>
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings */}
         {error ? (
           <div className="text-center py-12">
             <p className="text-destructive">{error}</p>
           </div>
         ) : loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-pulse">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-muted rounded-lg aspect-[3/4]" />
-            ))}
-          </div>
+          viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-pulse">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="bg-muted rounded-lg aspect-[3/4]" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4 animate-pulse">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-muted rounded-lg h-32" />
+              ))}
+            </div>
+          )
         ) : listings.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No listings found</p>
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {listings.map((listing) => (
-                <a
-                  key={listing._id}
-                  href={`/listings/${listing._id}`}
-                  className="group relative bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors"
-                >
-                  <div className="aspect-[3/4] relative bg-muted">
-                    {listing.images?.[0] && (
-                      <Image
-                        src={listing.images[0]}
-                        alt={listing.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      />
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <h3 className="font-medium line-clamp-1 group-hover:text-foreground/80">
-                      {listing.title}
-                    </h3>
-                    <p className="text-lg font-bold mt-1">
-                      ₦{listing.price.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
-                    </p>
-                  </div>
-                </a>
-              ))}
-            </div>
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {listings.map((listing) => (
+                  <a
+                    key={listing._id}
+                    href={`/listings/${listing._id}`}
+                    className="group relative bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors"
+                  >
+                    <div className="aspect-[3/4] relative bg-muted">
+                      {listing.images?.[0] && (
+                        <Image
+                          src={listing.images[0]}
+                          alt={listing.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        />
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-medium line-clamp-1 group-hover:text-foreground/80">
+                        {listing.title}
+                      </h3>
+                      <p className="text-lg font-bold mt-1">
+                        ₦{listing.price.toLocaleString()}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {listings.map((listing) => (
+                  <a
+                    key={listing._id}
+                    href={`/listings/${listing._id}`}
+                    className="group flex gap-4 bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors p-4"
+                  >
+                    <div className="relative w-32 h-32 bg-muted rounded-lg flex-shrink-0">
+                      {listing.images?.[0] && (
+                        <Image
+                          src={listing.images[0]}
+                          alt={listing.title}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 640px) 8rem, 8rem"
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-medium line-clamp-1 group-hover:text-foreground/80">
+                            {listing.title}
+                          </h3>
+                          <p className="text-xl font-bold mt-1">
+                            ₦{listing.price.toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(listing.createdAt).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-2 text-muted-foreground line-clamp-2">
+                        {listing.description}
+                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {listing.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-2 py-1 bg-secondary rounded-full text-xs"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            )}
 
             {/* Pagination */}
             {totalPages > 1 && (
