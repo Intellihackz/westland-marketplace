@@ -173,7 +173,7 @@ export default function MessagesPage() {
                     onClick={() => setSelectedConversation(null)}
                     className="mr-4 text-blue-500 md:hidden"
                   >
-                    &larr; Back
+                    &larr;
                   </button>
                   <div className="flex items-center gap-4">
                     <div className="relative w-12 h-12">

@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/context/AuthContext";
 import { Listing } from "@/lib/types/listing";
 import { UserProfile } from "@/lib/types/user";
 import { EditProfileModal } from "@/components/EditProfileModal";
+import { WithdrawModal } from '@/components/WithdrawModal';
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -16,17 +17,25 @@ export default function UserProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [activeListings, setActiveListings] = useState<Listing[]>([]);
   const [soldListings, setSoldListings] = useState<Listing[]>([]);
+  const [salesData, setSalesData] = useState<{
+    totalSales: number;
+    completedSales: number;
+    pendingAmount: number;
+    pendingSales: number;
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
 
   const isOwnProfile = user?._id === params.id;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profileRes, listingsRes] = await Promise.all([
+        const [profileRes, listingsRes, salesRes] = await Promise.all([
           fetch(`/api/users/${params.id}`),
           fetch(`/api/listings/user/${params.id}`),
+          isOwnProfile ? fetch(`/api/users/${params.id}/sales`) : null
         ]);
 
         if (profileRes.ok) {
@@ -49,6 +58,11 @@ export default function UserProfilePage() {
               listingsData.listings.filter((l: Listing) => l.status === "sold")
             );
           }
+        }
+
+        if (isOwnProfile && salesRes?.ok) {
+          const salesData = await salesRes.json();
+          setSalesData(salesData);
         }
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -73,6 +87,39 @@ export default function UserProfilePage() {
       });
     }
     setIsEditModalOpen(false);
+  };
+
+  const handleWithdraw = async (amount: number, bankDetails: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+  }) => {
+    try {
+      const response = await fetch(`/api/users/${params.id}/withdraw`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount,
+          bankDetails,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to process withdrawal');
+      }
+
+      // Refresh sales data
+      const salesRes = await fetch(`/api/users/${params.id}/sales`);
+      if (salesRes.ok) {
+        const newSalesData = await salesRes.json();
+        setSalesData(newSalesData);
+      }
+    } catch (error) {
+      throw error;
+    }
   };
 
   if (loading) {
@@ -136,14 +183,40 @@ export default function UserProfilePage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold">{profile.name}</h1>
               {isOwnProfile && (
-                <p className="text-gray-600 dark:text-gray-400">
-                  {profile.email}
-                </p>
-              )}
-              {profile.phone && isOwnProfile && (
-                <p className="text-gray-600 dark:text-gray-400">
-                  {profile.phone}
-                </p>
+                <>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {profile.email}
+                  </p>
+                  {profile.phone && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {profile.phone}
+                    </p>
+                  )}
+                  {salesData && (
+                    <div className="mt-4 grid grid-cols-2 gap-4">
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Total Sales</p>
+                        <p className="text-xl font-bold">₦{salesData.totalSales.toLocaleString()}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {salesData.completedSales} completed
+                        </p>
+                        <button
+                          onClick={() => setIsWithdrawModalOpen(true)}
+                          className="mt-2 w-full px-3 py-1.5 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-lg"
+                        >
+                          Withdraw
+                        </button>
+                      </div>
+                      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
+                        <p className="text-xl font-bold">₦{salesData.pendingAmount.toLocaleString()}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {salesData.pendingSales} in escrow
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
@@ -268,12 +341,20 @@ export default function UserProfilePage() {
       </main>
 
       {isOwnProfile && (
-        <EditProfileModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          user={profile}
-          onUpdate={handleProfileUpdate}
-        />
+        <>
+          <EditProfileModal
+            isOpen={isEditModalOpen}
+            onClose={() => setIsEditModalOpen(false)}
+            user={profile}
+            onUpdate={handleProfileUpdate}
+          />
+          <WithdrawModal
+            isOpen={isWithdrawModalOpen}
+            onClose={() => setIsWithdrawModalOpen(false)}
+            availableAmount={salesData?.totalSales || 0}
+            onWithdraw={handleWithdraw}
+          />
+        </>
       )}
     </div>
   );

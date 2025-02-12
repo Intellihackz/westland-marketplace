@@ -17,6 +17,7 @@ export default function ListingPage({ params }: { params: { id: string } }) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -33,11 +34,45 @@ export default function ListingPage({ params }: { params: { id: string } }) {
       } catch (error) {
         console.error('Failed to fetch listing:', error);
         setError('Failed to fetch listing');
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchListing();
   }, [params.id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Navigation />
+        <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Image Skeleton */}
+            <div className="space-y-4">
+              <div className="aspect-square rounded-lg bg-muted animate-pulse" />
+              <div className="grid grid-cols-4 gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg bg-muted animate-pulse" />
+                ))}
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="space-y-4">
+              <div className="h-8 bg-muted rounded w-3/4 animate-pulse" />
+              <div className="h-10 bg-muted rounded w-1/2 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-4 bg-muted rounded animate-pulse" />
+                <div className="h-4 bg-muted rounded w-2/3 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (error || !listing) {
     return (
