@@ -78,7 +78,7 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
         price: Number(formData.get('price')),
         category: formData.get('category'),
         condition: formData.get('condition'),
-        images: images, // Now directly using base64 images
+        images: images,
         tags,
       };
 
@@ -92,7 +92,9 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
         throw new Error('Failed to create listing');
       }
 
+      const { id } = await res.json();
       router.refresh();
+      router.push(`/listings/${id}`);
       onClose();
       // Reset form
       setImages([]);
@@ -139,7 +141,7 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
       />
 
       {/* Modal */}
-      <div className="relative z-50 w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto bg-background rounded-t-lg sm:rounded-lg border shadow-lg safe-bottom">
+      <div className="relative z-50 w-full sm:max-w-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] overflow-y-auto bg-background rounded-t-lg sm:rounded-lg border shadow-lg safe-bottom pb-[80px] sm:pb-0">
         <div className="sticky top-0 bg-background border-b z-10">
           {/* Mobile drag indicator */}
           <div className="w-12 h-1.5 bg-muted rounded-full mx-auto my-3 sm:hidden" />
@@ -246,6 +248,7 @@ export function CreateListingModal({ isOpen, onClose }: CreateListingModalProps)
                 <option value="Notes">Notes</option>
                 <option value="Clothing">Clothing</option>
                 <option value="Sports">Sports</option>
+                <option value="Food">Food</option>
                 <option value="Other">Other</option>
               </select>
             </div>

@@ -106,10 +106,10 @@ function ListingsContent() {
     <div className="min-h-screen">
       <Navigation />
       
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="mb-6 sm:mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl sm:text-2xl font-bold">Browse Listings</h1>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-xl font-semibold">Browse Listings</h1>
             
             {/* View Toggle */}
             <div className="hidden sm:flex border rounded-lg overflow-hidden">
@@ -378,9 +378,9 @@ function ListingsContent() {
                   <a
                     key={listing._id}
                     href={`/listings/${listing._id}`}
-                    className="group relative bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors"
+                    className="group relative bg-background rounded-lg border overflow-hidden hover:border-foreground/20 transition-colors flex flex-col h-full"
                   >
-                    <div className="aspect-[3/4] relative bg-muted">
+                    <div className="aspect-square relative bg-muted">
                       {listing.images?.[0] && (
                         <Image
                           src={listing.images[0]}
@@ -391,16 +391,21 @@ function ListingsContent() {
                         />
                       )}
                     </div>
-                    <div className="p-3">
-                      <h3 className="font-medium line-clamp-1 group-hover:text-foreground/80">
+                    <div className="p-4 flex flex-col flex-1">
+                      <h3 className="font-medium line-clamp-1 group-hover:text-foreground/80 mb-1">
                         {listing.title}
                       </h3>
-                      <p className="text-lg font-bold mt-1">
-                        ₦{listing.price.toLocaleString()}
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-2 flex-1">
+                        {listing.description}
                       </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
-                      </p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <p className="text-lg font-bold text-primary">
+                          ₦{listing.price.toLocaleString()}
+                        </p>
+                        <span className="text-xs px-2 py-1 bg-secondary/50 rounded-full">
+                          {listing.condition.charAt(0).toUpperCase() + listing.condition.slice(1)}
+                        </span>
+                      </div>
                     </div>
                   </a>
                 ))}

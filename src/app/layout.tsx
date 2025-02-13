@@ -66,7 +66,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className="pb-[80px] sm:pb-0">
         <AuthProvider>
           {children}
           <Analytics />

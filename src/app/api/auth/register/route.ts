@@ -13,7 +13,6 @@ export async function POST(req: Request) {
       );
     }
 
-
     const client = await clientPromise;
     const db = client.db("unimarket");
 
@@ -32,11 +31,15 @@ export async function POST(req: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Check if this is the admin email
+    const isAdmin = email.toLowerCase() === 'zephyrdev@duck.com';
+
     // Create user
     const result = await db.collection("users").insertOne({
       email: email.toLowerCase(),
       password: hashedPassword,
       name,
+      role: isAdmin ? 'admin' : 'user',
       createdAt: new Date(),
     });
 

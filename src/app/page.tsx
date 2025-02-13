@@ -13,6 +13,7 @@ const categories = [
   'Notes',
   'Clothing',
   'Sports',
+  'Food',
   'Other'
 ] as const;
 
@@ -52,16 +53,16 @@ export default function Home() {
     <div className="min-h-screen">
       <Navigation />
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
-        <section className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 text-primary">
+        <section className="text-center mb-6">
+          <h2 className="text-4xl font-bold mb-1 text-primary">
             Westland University Marketplace
           </h2>
-          <p className="text-muted-foreground mb-8">
+          <p className="text-muted-foreground mb-4">
             Buy and sell with your fellow Westland students
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
             <form onSubmit={handleSearch} className="flex gap-4 justify-center w-full max-w-md">
               <input
                 type="search"
@@ -81,8 +82,8 @@ export default function Home() {
         </section>
 
         {/* Featured Categories */}
-        <section className="mb-12">
-          <h3 className="text-2xl font-semibold mb-6">Browse Categories</h3>
+        <section className="mb-8">
+          <h3 className="text-3xl font-semibold mb-4">Browse Categories</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {categories.map((category) => (
               <button
@@ -177,7 +178,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t mt-20">
+      <footer className="hidden lg:block border-t mt-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <p className="text-center text-muted-foreground">
             © 2024 Westplace - Westland University. All rights reserved.
